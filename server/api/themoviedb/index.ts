@@ -324,6 +324,35 @@ class TheMovieDb extends ExternalAPI implements TvShowProvider {
     }
   };
 
+  public getMovieOriginCountries = async ({
+    movieId,
+  }: {
+    movieId: number;
+  }): Promise<string[]> => {
+    try {
+      const data = await this.get<
+        Pick<TmdbMovieDetails, 'origin_country' | 'production_countries'>
+      >(`/movie/${movieId}`, undefined, 604800, {
+        // Only keep the fields needed for content filtering in the cache
+        transform: (movie) => ({
+          origin_country: movie.origin_country,
+          production_countries: movie.production_countries,
+        }),
+      });
+
+      return data.origin_country?.length
+        ? data.origin_country
+        : (data.production_countries ?? []).map(
+            (country) => country.iso_3166_1
+          );
+    } catch (e) {
+      throw new Error(
+        `[TMDB] Failed to fetch movie origin countries: ${e.message}`,
+        { cause: e }
+      );
+    }
+  };
+
   public getMovie = async ({
     movieId,
     language = this.locale,

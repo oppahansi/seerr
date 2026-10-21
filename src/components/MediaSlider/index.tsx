@@ -92,12 +92,15 @@ const MediaSlider = ({
     });
   }
 
+  const lastPage = data?.[data.length - 1];
+  const hasMorePages =
+    !!lastPage &&
+    lastPage.page < lastPage.totalPages &&
+    (data?.[0]?.totalResults ?? 0) > size * 20;
+  const canFetchMore = titles.length < 24 && size < 5 && hasMorePages;
+
   useEffect(() => {
-    if (
-      titles.length < 24 &&
-      size < 5 &&
-      (data?.[0]?.totalResults ?? 0) > size * 20
-    ) {
+    if (canFetchMore) {
       setSize(size + 1);
     }
 
@@ -106,9 +109,15 @@ const MediaSlider = ({
       // at all for our purposes.
       onNewTitles(titles.length);
     }
-  }, [titles, setSize, size, data, onNewTitles]);
+  }, [titles, setSize, size, canFetchMore, onNewTitles]);
 
-  if (hideWhenEmpty && (data?.[0].results ?? []).length === 0) {
+  // A page can be empty when the server hides all of its titles, so only
+  // treat the slider as empty once no more pages will be fetched.
+  if (
+    hideWhenEmpty &&
+    (data ?? []).every((page) => page.results.length === 0) &&
+    !canFetchMore
+  ) {
     return null;
   }
 

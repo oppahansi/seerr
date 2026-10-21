@@ -49,6 +49,19 @@ These settings control the region and language used specifically for blocklist c
 
 These settings are separate from the general "Discover Region" and "Discover Language" settings, allowing you to blocklist content from specific regions/languages regardless of what users see in their Discover pages.
 
+## Hidden Languages and Hidden Countries
+
+These settings hide movies and series everywhere in Seerr for all users: in Discover, Trending, search results, recommendations, similar titles, collections, and person credits. Titles are removed by the server before they are sent to the browser.
+
+- **Hidden Languages**: Titles whose original language is one of the selected languages are hidden.
+- **Hidden Countries**: Titles whose origin countries are all among the selected countries are hidden. Co-productions that also involve other countries remain visible.
+
+Unlike "Discover Language", which only narrows what the Discover pages show, these settings exclude content across the whole application. They do not affect your media server library, and titles can still be opened through a direct link.
+
+:::info
+TMDB does not include the origin country of movies in its lists, so when countries are hidden Seerr looks up each movie's details. These lookups are cached, but the first load of a page may be slower.
+:::
+
 ## Blocklist Content with Tags and Limit Content Blocklisted per Tag
 
 These settings blocklist any TV shows or movies that have one of the entered tags. The "Process Blocklisted Tags" job adds entries to the blocklist based on the configured blocklisted tags. If a blocklisted tag is removed, any media blocklisted under that tag will be removed from the blocklist when the "Process Blocklisted Tags" job runs.

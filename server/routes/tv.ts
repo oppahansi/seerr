@@ -7,6 +7,7 @@ import { MediaType } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import Media from '@server/entity/Media';
 import { Watchlist } from '@server/entity/Watchlist';
+import { filterExcludedResults } from '@server/lib/contentFilter';
 import logger from '@server/logger';
 import { mapTvResult } from '@server/models/Search';
 import { mapSeasonWithEpisodes, mapTvDetails } from '@server/models/Tv';
@@ -103,11 +104,12 @@ tvRoutes.get('/:id/recommendations', async (req, res, next) => {
   const tmdb = new TheMovieDb();
 
   try {
-    const results = await tmdb.getTvRecommendations({
+    const tmdbResults = await tmdb.getTvRecommendations({
       tvId: Number(req.params.id),
       page: Number(req.query.page),
       language: (req.query.language as string) ?? req.locale,
     });
+    const results = await filterExcludedResults(tmdbResults, 'tv');
 
     const media = await Media.getRelatedMedia(
       req.user,
@@ -148,11 +150,12 @@ tvRoutes.get('/:id/similar', async (req, res, next) => {
   const tmdb = new TheMovieDb();
 
   try {
-    const results = await tmdb.getTvSimilar({
+    const tmdbResults = await tmdb.getTvSimilar({
       tvId: Number(req.params.id),
       page: Number(req.query.page),
       language: (req.query.language as string) ?? req.locale,
     });
+    const results = await filterExcludedResults(tmdbResults, 'tv');
 
     const media = await Media.getRelatedMedia(
       req.user,

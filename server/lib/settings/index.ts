@@ -150,6 +150,8 @@ export interface MainSettings {
   originalLanguage: string;
   blocklistRegion: string;
   blocklistLanguage: string;
+  excludedLanguages: string;
+  excludedCountries: string;
   blocklistedTags: string;
   blocklistedTagsLimit: number;
   mediaServerType: number;
@@ -428,6 +430,8 @@ class Settings {
         originalLanguage: '',
         blocklistRegion: '',
         blocklistLanguage: '',
+        excludedLanguages: '',
+        excludedCountries: '',
         blocklistedTags: '',
         blocklistedTagsLimit: 50,
         mediaServerType: MediaServerType.NOT_CONFIGURED,

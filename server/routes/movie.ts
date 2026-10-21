@@ -6,6 +6,7 @@ import { MediaType } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import Media from '@server/entity/Media';
 import { Watchlist } from '@server/entity/Watchlist';
+import { filterExcludedResults } from '@server/lib/contentFilter';
 import logger from '@server/logger';
 import { mapMovieDetails } from '@server/models/Movie';
 import { mapMovieResult } from '@server/models/Search';
@@ -64,11 +65,12 @@ movieRoutes.get('/:id/recommendations', async (req, res, next) => {
   const tmdb = new TheMovieDb();
 
   try {
-    const results = await tmdb.getMovieRecommendations({
+    const tmdbResults = await tmdb.getMovieRecommendations({
       movieId: Number(req.params.id),
       page: Number(req.query.page),
       language: (req.query.language as string) ?? req.locale,
     });
+    const results = await filterExcludedResults(tmdbResults, 'movie');
 
     const media = await Media.getRelatedMedia(
       req.user,
@@ -110,11 +112,12 @@ movieRoutes.get('/:id/similar', async (req, res, next) => {
   const tmdb = new TheMovieDb();
 
   try {
-    const results = await tmdb.getMovieSimilar({
+    const tmdbResults = await tmdb.getMovieSimilar({
       movieId: Number(req.params.id),
       page: Number(req.query.page),
       language: (req.query.language as string) ?? req.locale,
     });
+    const results = await filterExcludedResults(tmdbResults, 'movie');
 
     const media = await Media.getRelatedMedia(
       req.user,

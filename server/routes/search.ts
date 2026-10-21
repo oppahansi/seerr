@@ -1,6 +1,7 @@
 import TheMovieDb from '@server/api/themoviedb';
 import type { TmdbSearchMultiResponse } from '@server/api/themoviedb/interfaces';
 import Media from '@server/entity/Media';
+import { filterExcludedResults } from '@server/lib/contentFilter';
 import { findSearchProvider } from '@server/lib/search';
 import logger from '@server/logger';
 import { mapSearchResults } from '@server/models/Search';
@@ -32,6 +33,8 @@ searchRoutes.get('/', async (req, res, next) => {
         language: (req.query.language as string) ?? req.locale,
       });
     }
+
+    results = await filterExcludedResults(results);
 
     const media = await Media.getRelatedMedia(
       req.user,
