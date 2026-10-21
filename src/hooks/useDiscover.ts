@@ -52,6 +52,10 @@ export const encodeURIExtraParams = (string: string): string => {
   return finalString;
 };
 
+// Pages auto-loaded while fewer titles than this are visible
+const MIN_VISIBLE_TITLES = 20;
+const MAX_FILL_PAGES = 10;
+
 const useDiscover = <
   T extends BaseMedia,
   S = Record<string, never>,
@@ -96,14 +100,6 @@ const useDiscover = <
   );
 
   const resultIds: Set<number> = new Set<number>();
-
-  const isLoadingInitialData = !data && !error;
-  const isLoadingMore =
-    isLoadingInitialData ||
-    (size > 0 &&
-      !!data &&
-      typeof data[size - 1] === 'undefined' &&
-      isValidating);
 
   const fetchMore = () => {
     setSize(size + 1);
@@ -153,12 +149,44 @@ const useDiscover = <
     });
   }
 
-  const isEmpty = !isLoadingInitialData && titles?.length === 0;
-  const isReachingEnd =
-    isEmpty ||
-    (!!data && (data[data?.length - 1]?.results.length ?? 0) < 20) ||
-    (!!data && (data[data?.length - 1]?.totalResults ?? 0) <= size * 20) ||
-    (!!data && (data[data?.length - 1]?.totalResults ?? 0) < 41);
+  const lastPage = data?.[data.length - 1];
+  // Pages can hold fewer than 20 results when titles are filtered out (by
+  // the server's hidden languages/countries or the options above), so the
+  // page count is used to detect the last page.
+  const hasLoadedLastPage =
+    !!lastPage &&
+    ((typeof lastPage.page === 'number' &&
+    typeof lastPage.totalPages === 'number'
+      ? lastPage.page >= lastPage.totalPages
+      : (lastPage.results?.length ?? 0) < 20) ||
+      (lastPage.totalResults ?? 0) <= size * 20 ||
+      (lastPage.totalResults ?? 0) < 41);
+
+  // Keep fetching pages while too few titles are visible to fill the view
+  // and trigger infinite scrolling, up to a limit.
+  const isFilling =
+    !error &&
+    !!data &&
+    !hasLoadedLastPage &&
+    titles.length < MIN_VISIBLE_TITLES &&
+    size < MAX_FILL_PAGES;
+
+  useEffect(() => {
+    if (isFilling && data?.length === size) {
+      setSize(size + 1);
+    }
+  }, [isFilling, data?.length, size, setSize]);
+
+  const isLoadingInitialData =
+    (!data && !error) || (isFilling && titles.length === 0);
+  const isLoadingMore =
+    isLoadingInitialData ||
+    (size > 0 &&
+      !!data &&
+      typeof data[size - 1] === 'undefined' &&
+      isValidating);
+  const isEmpty = !isLoadingInitialData && titles.length === 0;
+  const isReachingEnd = isEmpty || hasLoadedLastPage;
 
   useEffect(() => {
     if (error && titles.length) {

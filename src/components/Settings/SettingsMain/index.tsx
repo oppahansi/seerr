@@ -3,6 +3,7 @@ import Button from '@app/components/Common/Button';
 import LoadingSpinner from '@app/components/Common/LoadingSpinner';
 import PageTitle from '@app/components/Common/PageTitle';
 import SensitiveInput from '@app/components/Common/SensitiveInput';
+import ContentFilterSelector from '@app/components/ContentFilterSelector';
 import LanguageSelector from '@app/components/LanguageSelector';
 import RegionSelector from '@app/components/RegionSelector';
 import CopyButton from '@app/components/Settings/CopyButton';
@@ -44,6 +45,12 @@ const messages = defineMessages('components.Settings.SettingsMain', {
   blocklistLanguage: 'Blocklist Language',
   blocklistLanguageTip:
     'Language used for blocklist content scanning (independent of discover settings)',
+  excludedLanguages: 'Hidden Languages',
+  excludedLanguagesTip:
+    'Hide all movies and series with these original languages everywhere in Seerr',
+  excludedCountries: 'Hidden Countries',
+  excludedCountriesTip:
+    'Hide all movies and series originating only from these countries everywhere in Seerr (co-productions with other countries stay visible)',
   blocklistedTags: 'Blocklist Content with Tags',
   blocklistedTagsTip:
     'Automatically add content with tags to the blocklist using the "Process Blocklisted Tags" job',
@@ -183,6 +190,8 @@ const SettingsMain = () => {
             streamingRegion: data?.streamingRegion || 'US',
             blocklistRegion: data?.blocklistRegion || '',
             blocklistLanguage: data?.blocklistLanguage || '',
+            excludedLanguages: data?.excludedLanguages || '',
+            excludedCountries: data?.excludedCountries || '',
             blocklistedTags: data?.blocklistedTags,
             blocklistedTagsLimit: data?.blocklistedTagsLimit || 50,
             partialRequestsEnabled: data?.partialRequestsEnabled,
@@ -207,6 +216,8 @@ const SettingsMain = () => {
                 originalLanguage: values.originalLanguage,
                 blocklistRegion: values.blocklistRegion,
                 blocklistLanguage: values.blocklistLanguage,
+                excludedLanguages: values.excludedLanguages,
+                excludedCountries: values.excludedCountries,
                 blocklistedTags: values.blocklistedTags,
                 blocklistedTagsLimit: values.blocklistedTagsLimit,
                 partialRequestsEnabled: values.partialRequestsEnabled,
@@ -456,6 +467,46 @@ const SettingsMain = () => {
                         serverValue={data?.blocklistLanguage}
                         value={values.blocklistLanguage}
                         fieldName="blocklistLanguage"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="form-row">
+                  <label htmlFor="excludedLanguages" className="text-label">
+                    <span>
+                      {intl.formatMessage(messages.excludedLanguages)}
+                    </span>
+                    <span className="label-tip">
+                      {intl.formatMessage(messages.excludedLanguagesTip)}
+                    </span>
+                  </label>
+                  <div className="form-input-area">
+                    <div className="form-input-field relative z-[19]">
+                      <ContentFilterSelector
+                        type="language"
+                        fieldName="excludedLanguages"
+                        value={values.excludedLanguages}
+                        setFieldValue={setFieldValue}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="form-row">
+                  <label htmlFor="excludedCountries" className="text-label">
+                    <span>
+                      {intl.formatMessage(messages.excludedCountries)}
+                    </span>
+                    <span className="label-tip">
+                      {intl.formatMessage(messages.excludedCountriesTip)}
+                    </span>
+                  </label>
+                  <div className="form-input-area">
+                    <div className="form-input-field relative z-[18]">
+                      <ContentFilterSelector
+                        type="country"
+                        fieldName="excludedCountries"
+                        value={values.excludedCountries}
+                        setFieldValue={setFieldValue}
                       />
                     </div>
                   </div>

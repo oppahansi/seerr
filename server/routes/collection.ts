@@ -1,6 +1,7 @@
 import TheMovieDb from '@server/api/themoviedb';
 import { MediaType } from '@server/constants/media';
 import Media from '@server/entity/Media';
+import { filterExcludedMedia } from '@server/lib/contentFilter';
 import logger from '@server/logger';
 import { mapCollection } from '@server/models/Collection';
 import { Router } from 'express';
@@ -11,10 +12,14 @@ collectionRoutes.get<{ id: string }>('/:id', async (req, res, next) => {
   const tmdb = new TheMovieDb();
 
   try {
-    const collection = await tmdb.getCollection({
+    const tmdbCollection = await tmdb.getCollection({
       collectionId: Number(req.params.id),
       language: (req.query.language as string) ?? req.locale,
     });
+    const collection = {
+      ...tmdbCollection,
+      parts: await filterExcludedMedia(tmdbCollection.parts, 'movie'),
+    };
 
     const media = await Media.getRelatedMedia(
       req.user,

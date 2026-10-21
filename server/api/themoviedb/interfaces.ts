@@ -154,6 +154,7 @@ export interface TmdbMovieDetails {
   overview?: string;
   popularity: number;
   production_companies: TmdbProductionCompany[];
+  origin_country?: string[];
   production_countries: {
     iso_3166_1: string;
     name: string;

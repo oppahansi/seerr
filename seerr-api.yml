@@ -256,6 +256,14 @@ components:
         versionCheck:
           type: boolean
           example: false
+        excludedLanguages:
+          type: string
+          description: Pipe-separated ISO 639-1 codes. Movies and series with these original languages are hidden.
+          example: 'zh|hi'
+        excludedCountries:
+          type: string
+          description: Pipe-separated ISO 3166-1 codes. Movies and series whose origin countries are all in this list are hidden.
+          example: 'CN|IN'
     NetworkSettings:
       type: object
       properties:
