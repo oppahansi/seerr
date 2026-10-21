@@ -1,5 +1,6 @@
 import TheMovieDb from '@server/api/themoviedb';
 import Media from '@server/entity/Media';
+import { filterExcludedMedia } from '@server/lib/contentFilter';
 import logger from '@server/logger';
 import {
   mapCastCredits,
@@ -36,10 +37,15 @@ personRoutes.get('/:id/combined_credits', async (req, res, next) => {
   const tmdb = new TheMovieDb();
 
   try {
-    const combinedCredits = await tmdb.getPersonCombinedCredits({
+    const credits = await tmdb.getPersonCombinedCredits({
       personId: Number(req.params.id),
       language: (req.query.language as string) ?? req.locale,
     });
+    const combinedCredits = {
+      ...credits,
+      cast: await filterExcludedMedia(credits.cast),
+      crew: await filterExcludedMedia(credits.crew),
+    };
 
     const castMedia = await Media.getRelatedMedia(
       req.user,

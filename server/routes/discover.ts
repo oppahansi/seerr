@@ -13,6 +13,10 @@ import type {
   GenreSliderItem,
   WatchlistResponse,
 } from '@server/interfaces/api/discoverInterfaces';
+import {
+  filterExcludedResults,
+  isOnlyExcludedLanguages,
+} from '@server/lib/contentFilter';
 import { getSettings } from '@server/lib/settings';
 import logger from '@server/logger';
 import { mapProductionCompany } from '@server/models/Movie';
@@ -62,6 +66,14 @@ export const createTmdbWithBlocklistSettings = (): TheMovieDb => {
 
 const discoverRoutes = Router();
 
+// Returned when only hidden languages were requested
+const emptyDiscoverResponse = {
+  page: 1,
+  totalPages: 1,
+  totalResults: 0,
+  results: [],
+};
+
 const QueryFilterOptions = z.object({
   page: z.coerce.string().optional(),
   primaryReleaseDateGte: z.coerce.string().optional(),
@@ -110,7 +122,11 @@ discoverRoutes.get('/movies', async (req, res, next) => {
     const keywords = query.keywords;
     const excludeKeywords = query.excludeKeywords;
 
-    const data = await tmdb.getDiscoverMovies({
+    if (isOnlyExcludedLanguages(query.language)) {
+      return res.status(200).json({ ...emptyDiscoverResponse, keywords: [] });
+    }
+
+    const tmdbData = await tmdb.getDiscoverMovies({
       page: Number(query.page),
       sortBy: query.sortBy,
       language: req.locale ?? query.language,
@@ -138,6 +154,7 @@ discoverRoutes.get('/movies', async (req, res, next) => {
       certificationLte: query.certificationLte,
       certificationCountry: query.certificationCountry,
     });
+    const data = await filterExcludedResults(tmdbData, 'movie');
 
     const media = await Media.getRelatedMedia(
       req.user,
@@ -206,11 +223,16 @@ discoverRoutes.get<{ language: string }>(
         return next({ status: 404, message: 'Language not found.' });
       }
 
-      const data = await tmdb.getDiscoverMovies({
+      if (isOnlyExcludedLanguages(language.iso_639_1)) {
+        return res.status(200).json({ ...emptyDiscoverResponse, language });
+      }
+
+      const tmdbData = await tmdb.getDiscoverMovies({
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
         originalLanguage: req.params.language,
       });
+      const data = await filterExcludedResults(tmdbData, 'movie');
 
       const media = await Media.getRelatedMedia(
         req.user,
@@ -268,11 +290,12 @@ discoverRoutes.get<{ genreId: string }>(
         return next({ status: 404, message: 'Genre not found.' });
       }
 
-      const data = await tmdb.getDiscoverMovies({
+      const tmdbData = await tmdb.getDiscoverMovies({
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
         genre: req.params.genreId as string,
       });
+      const data = await filterExcludedResults(tmdbData, 'movie');
 
       const media = await Media.getRelatedMedia(
         req.user,
@@ -320,11 +343,12 @@ discoverRoutes.get<{ studioId: string }>(
     try {
       const studio = await tmdb.getStudio(Number(req.params.studioId));
 
-      const data = await tmdb.getDiscoverMovies({
+      const tmdbData = await tmdb.getDiscoverMovies({
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
         studio: req.params.studioId as string,
       });
+      const data = await filterExcludedResults(tmdbData, 'movie');
 
       const media = await Media.getRelatedMedia(
         req.user,
@@ -374,11 +398,12 @@ discoverRoutes.get('/movies/upcoming', async (req, res, next) => {
     .split('T')[0];
 
   try {
-    const data = await tmdb.getDiscoverMovies({
+    const tmdbData = await tmdb.getDiscoverMovies({
       page: Number(req.query.page),
       language: (req.query.language as string) ?? req.locale,
       primaryReleaseDateGte: date,
     });
+    const data = await filterExcludedResults(tmdbData, 'movie');
 
     const media = await Media.getRelatedMedia(
       req.user,
@@ -422,7 +447,11 @@ discoverRoutes.get('/tv', async (req, res, next) => {
     const query = TvApiQuerySchema.parse(req.query);
     const keywords = query.keywords;
     const excludeKeywords = query.excludeKeywords;
-    const data = await tmdb.getDiscoverTv({
+
+    if (isOnlyExcludedLanguages(query.language)) {
+      return res.status(200).json({ ...emptyDiscoverResponse, keywords: [] });
+    }
+    const tmdbData = await tmdb.getDiscoverTv({
       page: Number(query.page),
       sortBy: query.sortBy,
       language: req.locale ?? query.language,
@@ -451,6 +480,7 @@ discoverRoutes.get('/tv', async (req, res, next) => {
       certificationLte: query.certificationLte,
       certificationCountry: query.certificationCountry,
     });
+    const data = await filterExcludedResults(tmdbData, 'tv');
 
     const media = await Media.getRelatedMedia(
       req.user,
@@ -518,11 +548,16 @@ discoverRoutes.get<{ language: string }>(
         return next({ status: 404, message: 'Language not found.' });
       }
 
-      const data = await tmdb.getDiscoverTv({
+      if (isOnlyExcludedLanguages(language.iso_639_1)) {
+        return res.status(200).json({ ...emptyDiscoverResponse, language });
+      }
+
+      const tmdbData = await tmdb.getDiscoverTv({
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
         originalLanguage: req.params.language,
       });
+      const data = await filterExcludedResults(tmdbData, 'tv');
 
       const media = await Media.getRelatedMedia(
         req.user,
@@ -580,11 +615,12 @@ discoverRoutes.get<{ genreId: string }>(
         return next({ status: 404, message: 'Genre not found.' });
       }
 
-      const data = await tmdb.getDiscoverTv({
+      const tmdbData = await tmdb.getDiscoverTv({
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
         genre: req.params.genreId,
       });
+      const data = await filterExcludedResults(tmdbData, 'tv');
 
       const media = await Media.getRelatedMedia(
         req.user,
@@ -632,11 +668,12 @@ discoverRoutes.get<{ networkId: string }>(
     try {
       const network = await tmdb.getNetwork(Number(req.params.networkId));
 
-      const data = await tmdb.getDiscoverTv({
+      const tmdbData = await tmdb.getDiscoverTv({
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
         network: Number(req.params.networkId),
       });
+      const data = await filterExcludedResults(tmdbData, 'tv');
 
       const media = await Media.getRelatedMedia(
         req.user,
@@ -686,11 +723,12 @@ discoverRoutes.get('/tv/upcoming', async (req, res, next) => {
     .split('T')[0];
 
   try {
-    const data = await tmdb.getDiscoverTv({
+    const tmdbData = await tmdb.getDiscoverTv({
       page: Number(req.query.page),
       language: (req.query.language as string) ?? req.locale,
       firstAirDateGte: date,
     });
+    const data = await filterExcludedResults(tmdbData, 'tv');
 
     const media = await Media.getRelatedMedia(
       req.user,
@@ -764,7 +802,15 @@ discoverRoutes.get('/trending', async (req, res, next) => {
       }),
     } as const;
 
-    const { data, mapper, type } = await trendingFetchers[mediaType]();
+    const {
+      data: trendingData,
+      mapper,
+      type,
+    } = await trendingFetchers[mediaType]();
+    const data = await filterExcludedResults(
+      trendingData,
+      mediaType === 'all' ? undefined : mediaType
+    );
 
     const media = await Media.getRelatedMedia(
       req.user,
@@ -808,11 +854,12 @@ discoverRoutes.get<{ keywordId: string }>(
     const tmdb = new TheMovieDb();
 
     try {
-      const data = await tmdb.getMoviesByKeyword({
+      const tmdbData = await tmdb.getMoviesByKeyword({
         keywordId: Number(req.params.keywordId),
         page: Number(req.query.page),
         language: (req.query.language as string) ?? req.locale,
       });
+      const data = await filterExcludedResults(tmdbData, 'movie');
 
       const media = await Media.getRelatedMedia(
         req.user,
