@@ -16,7 +16,39 @@ module.exports = {
         width: 'width',
       },
       fontFamily: {
-        sans: ['Inter Variable', ...defaultTheme.fontFamily.sans],
+        sans: ['Quicksand', 'Inter Variable', ...defaultTheme.fontFamily.sans],
+      },
+      // Kaleidochromic palette (ported from the Jellyfin ThemeSwitcher theme)
+      colors: {
+        gray: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d0d0d4',
+          400: '#b5b5b5',
+          500: '#5a5a62',
+          600: '#3a3a40',
+          700: '#26262b',
+          800: '#18181c',
+          900: '#080808',
+        },
+        indigo: {
+          50: '#f0f3fc',
+          100: '#e0e6f8',
+          200: '#c4cff2',
+          300: '#a3b3e8',
+          400: '#8196dc',
+          500: '#6279cd',
+          600: '#5468b8',
+          700: '#46579a',
+          800: '#3a4680',
+          900: '#2e3766',
+        },
+      },
+      borderRadius: {
+        md: '0.5rem',
+        lg: '0.75rem',
+        xl: '1rem',
       },
       typography: (theme) => ({
         DEFAULT: {
@@ -86,8 +118,11 @@ module.exports = {
     },
   },
   plugins: [
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require('@tailwindcss/forms'),
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require('@tailwindcss/typography'),
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require('@tailwindcss/aspect-ratio'),
   ],
 };
