@@ -36,7 +36,7 @@
   }
 
   html:hover {
-    scrollbar-color: #5a5a62 #18181c;
+    scrollbar-color: #8c8c96 #18181c;
   }
 
   /* WebKit scrollbar styles */
@@ -53,7 +53,7 @@
   }
 
   html:hover::-webkit-scrollbar-thumb {
-    background-color: #5a5a62;
+    background-color: #8c8c96;
   }
 
   @media (min-width: 640px) {
@@ -324,7 +324,7 @@
   }
 
   .label-tip {
-    @apply block font-medium text-gray-500;
+    @apply block font-medium text-gray-400;
   }
 
   button,
