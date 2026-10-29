@@ -15,6 +15,15 @@ module.exports = {
         'max-height': 'max-height',
         width: 'width',
       },
+      keyframes: {
+        'backdrop-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+      },
+      animation: {
+        'backdrop-in': 'backdrop-in 0.8s ease both',
+      },
       fontFamily: {
         sans: ['Quicksand', 'Inter Variable', ...defaultTheme.fontFamily.sans],
       },
