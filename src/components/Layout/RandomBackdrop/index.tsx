@@ -70,7 +70,7 @@ const RandomBackdrop = () => {
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-75"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-40"
       aria-hidden
     >
       {layers.map((url, i) => (
