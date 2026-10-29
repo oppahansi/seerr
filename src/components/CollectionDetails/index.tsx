@@ -3,6 +3,7 @@ import Button from '@app/components/Common/Button';
 import ButtonWithDropdown from '@app/components/Common/ButtonWithDropdown';
 import CachedImage from '@app/components/Common/CachedImage';
 import LoadingSpinner from '@app/components/Common/LoadingSpinner';
+import MediaBackdrop from '@app/components/Common/MediaBackdrop';
 import PageTitle from '@app/components/Common/PageTitle';
 import Tooltip from '@app/components/Common/Tooltip';
 import RequestModal from '@app/components/RequestModal';
@@ -283,25 +284,7 @@ const CollectionDetails = ({ collection }: CollectionDetailsProps) => {
         height: 493,
       }}
     >
-      {data.backdropPath && (
-        <div className="media-page-bg-image">
-          <CachedImage
-            type="tmdb"
-            alt=""
-            src={`https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/${data.backdropPath}`}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            fill
-            priority
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                'linear-gradient(180deg, rgba(8, 8, 8, 0.47) 0%, rgba(8, 8, 8, 1) 100%)',
-            }}
-          />
-        </div>
-      )}
+      {data.backdropPath && <MediaBackdrop backdropPath={data.backdropPath} />}
       <PageTitle title={data.name} />
       <RequestModal
         tmdbId={data.id}
