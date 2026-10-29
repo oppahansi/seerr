@@ -5,14 +5,14 @@ import useSWR from 'swr';
 
 // Pages that show a backdrop of their own
 const OWN_BACKDROP_ROUTES = [
-  '/movie/',
-  '/tv/',
-  '/collection/',
+  '/movie/[movieId]',
+  '/tv/[tvId]',
+  '/collection/[collectionId]',
   '/issues/[issueId]',
 ];
 
 export const hasOwnBackdrop = (pathname: string) =>
-  OWN_BACKDROP_ROUTES.some((route) => pathname.startsWith(route));
+  OWN_BACKDROP_ROUTES.includes(pathname);
 
 /**
  * A random, blurred and dimmed backdrop behind pages that have none of
