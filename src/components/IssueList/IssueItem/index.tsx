@@ -131,7 +131,7 @@ const IssueItem = ({ issue }: IssueItemProps) => {
             className="absolute inset-0"
             style={{
               backgroundImage:
-                'linear-gradient(90deg, rgba(31, 41, 55, 0.47) 0%, rgba(31, 41, 55, 1) 100%)',
+                'linear-gradient(90deg, rgba(24, 24, 28, 0.47) 0%, rgba(24, 24, 28, 1) 100%)',
             }}
           />
         </div>
