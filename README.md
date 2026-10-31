@@ -1,3 +1,5 @@
+[![Discord](https://img.shields.io/static/v1?logo=discord&label=discord&message=Join&color=blue)](https://discord.gg/ncKmDEArqg)
+
 > [!IMPORTANT]
 > **This is a personal fork of [seerr-team/seerr](https://github.com/seerr-team/seerr), not the official Seerr.**
 > It is built for my own home server and deviates from upstream as described below. It is not supported by the Seerr
