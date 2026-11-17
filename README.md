@@ -8,7 +8,7 @@
 
 ## About this fork
 
-`main` is the latest upstream release (currently **v3.5.1**) plus the commits below, and is the only branch. A GitHub
+`main` is the latest upstream release (currently **v3.5.2**) plus the commits below, and is the only branch. A GitHub
 Action builds a Docker image from it on every push (see [Use the prebuilt image](#use-the-prebuilt-image)).
 
 <p align="center">
@@ -62,7 +62,7 @@ volumes:
 | Tag           | Meaning                                                                      |
 | ------------- | ---------------------------------------------------------------------------- |
 | `latest`      | The most recent build of `main`                                              |
-| `3.5.1`       | The upstream version `main` is based on (moves with each build of that base) |
+| `3.5.2`       | The upstream version `main` is based on (moves with each build of that base) |
 | `sha-abcdef0` | One specific commit, for pinning                                             |
 
 To update, run `docker compose pull && docker compose up -d`.
